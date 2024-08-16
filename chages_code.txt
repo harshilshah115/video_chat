@@ -1,0 +1,50 @@
+//before invalid session error (14-8-24:9:33pm)
+
+
+socket.on('offer', async (id, description) => {
+    try {
+        // Initialize the peerConnection if not already initialized
+        if (!peerConnection) {
+            peerConnection = createPeerConnection(id);
+        }
+
+        // Validate the received description
+        if (!description || !description.type || !description.sdp) {
+            throw new Error('Invalid session description received');
+        }
+
+        // // Set the remote description with the received offer
+        // await peerConnection.setRemoteDescription(description);
+
+        // Parse the received description and set it as the remote description
+        const remoteDesc = new RTCSessionDescription(description);
+        await peerConnection.setRemoteDescription(remoteDesc);
+
+        // Add the local stream tracks to the peer connection
+        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+        // Create an answer and set it as the local description
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+
+        // Send the answer back to the other peer
+        socket.emit('answer', id, peerConnection.localDescription);
+    } catch (error) {
+        console.error('Error handling offer:', error);
+    }
+});
+
+
+//before invalid session error (14-8-24:9:33pm)
+
+startButton.onclick = async () => {
+    try {
+        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        localVideo.srcObject = localStream;
+
+        // Signal the server to find a peer
+        socket.emit('join');
+    } catch (error) {
+        console.error('Error accessing media devices.', error);
+    }
+};
