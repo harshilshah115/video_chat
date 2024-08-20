@@ -3,13 +3,7 @@ const remoteVideo = document.getElementById('remoteVideo');
 const callButton = document.getElementById('callButton');
 const disconnectButton = document.getElementById('disconnectButton');
 
-const socket = io('https://videochat-teal.vercel.app/', {
-  transports: ['websocket', 'polling'], // Ensure both transports are allowed
-  secure: true,
-  reconnection: true,
-  reconnectionAttempts: Infinity,
-  reconnectionDelay: 1000
-});
+const socket = io('https://videochat-teal.vercel.app/');
 let peerConnection;
 
 const configuration = {
